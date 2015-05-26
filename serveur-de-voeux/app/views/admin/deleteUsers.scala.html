@@ -1,0 +1,102 @@
+@(firstname: String)(lastname: String)(listeUtilisateur: java.util.List[Users])(message:String)
+
+@import java.math.BigInteger; var j=0;
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav> <br/>
+    </div>
+
+
+
+} {
+
+    <br/> <br/> <br/>
+
+    <form accept-charset="UTF-8" role="form" method="GET" id="accueil" name="accueil" action="/ServeurDeVoeux/">
+        <button type="submit" class="btn btn-danger"> Retour à l'acceuil </button>
+    </form>
+
+    <div class="container" style="border: 1px #e4e4e4 solid;">
+
+        <div class="page-header">
+            <h1 style="color: cornflowerblue"> Supprimer un utilisateur </h1>
+        </div>
+
+        @if(message == "true"){
+            <div id="div4">
+                <div class="alert alert-success" role="alert">
+                    <a href="#" class="alert-link"> Suppression de l'utilisateur avec succès !</a>
+                </div>
+            </div>
+        }
+
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Liste des utilisateurs </h3>
+            </div>
+            <div class="panel-body">
+
+
+                <table class="table table-hover">
+
+                    <tr>
+                        <th> # </th>
+                        <th> Login </th>
+                        <th> Prénom </th>
+                        <th> Nom  </th>
+                        <th> Email </th>
+                        <th> Téléphone </th>
+                        <th> Supprimer </th>
+                    </tr>
+
+                    @for(liste <- listeUtilisateur) {
+                        @(j += 1)
+                        <form id="deleteUtilisateur@j" name="deleteUtilisateur@j" class="form-horizontal" role="form" method="POST" action="/ServeurDeVoeux/users/delete"> <!-- Formulaire -->
+                            <tr>
+                                <td> @j </td>
+
+                                <td> @liste.getLogin </td>
+                                <td> @liste.getFirstName </td>
+                                <td> @liste.getLastName </td>
+                                <td> @liste.getEmail</td>
+                                <td> @liste.getPhoneNumber</td>
+                                <td><button class="btn btn-danger" type="button" onclick="confirmDeleteUtilisateur('deleteUtilisateur@j')" > <i class="glyphicon glyphicon-trash"></i> Supprimer </button></td>
+                            </tr>
+                            <input type="hidden" name="login" value="@liste.getLogin"/>
+                         </form> <!-- Fin form -->
+                    }
+
+
+                </table> <!-- Fin table -->
+
+            </div>
+        </div> <!-- Fin panel panel-info -->
+
+        <script type="text/javascript">
+            $("#div4").delay(7500).fadeOut(600);
+        </script>
+    </div><!-- Fin container -->
+}

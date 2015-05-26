@@ -1,0 +1,132 @@
+@(firstname: String)(lastname: String)(majVoeux: Voeux)(ec: java.util.List[EC])
+
+@import helper._
+@import java.lang.String;
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/">Home</a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="/ServeurDeVoeux/voeux"> Gerer ces voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux/historique"> Historique des voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/UnAvailability/"> Préférences </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> <br/>
+    </div> <!-- Fin en-tête -->
+
+} {
+
+    <br/> <br/> <br/> <br/> <br/>
+
+    <div class="container" style="border: 1px #e4e4e4 solid;">
+
+        <div class="page-header">
+            <h1 style="color: cornflowerblue">  Modifier le voeu suivant </h1>
+        </div>
+
+        <h3>
+            @for(obec <- ec){
+                @if(obec.getCode_Ec.equals(majVoeux.getRef_ec)){
+                    @obec.getLibelle_ec
+                }
+            }
+        </h3>
+
+        <br/><br/>
+
+        <form id="modifier_voeux" name="modifier_voeux" class="form-horizontal" role="form" method="POST" action="modifiervoeu">
+
+            <div class="col-xs-3">
+                <label for="nb_h_cours">Nombre d'heures de Cours</label>
+            </div>
+            <div class="col-xs-3">
+                <input type="number" step="any" class="form-control input-number" value="@majVoeux.getVolume_horaire_cours_assure" id="nb_h_cours" name="nb_h_cours" required>
+            </div>
+
+            <label for="prioritaire_cours">Prioritaire :</label>
+            <input type="radio"  name="prioritaire_cours" value="1" class="bn" required @{if(majVoeux.getPrioritaireCours == 1)("checked")}> Oui
+            <input type="radio"  name="prioritaire_cours" value="0" @{if(majVoeux.getPrioritaireCours == 0)("checked")}> Non <br/>
+
+            <div class="col-xs-3">
+                <label for="choixCours">&nbsp;&nbsp;Choix :</label>
+                <input type="radio" name="choixCours" value="1" required @{if(majVoeux.getChoixCours == 1)("checked")}> 1
+                <input type="radio" name="choixCours" value="2" @{if(majVoeux.getChoixCours == 2)("checked")}> 2
+            </div>
+
+            <br/><br/><br/>
+
+            <div class="col-xs-3">
+                <label class="control-label"  for="nb_h_tds">Nombre d'heures de Tds</label>
+            </div>
+            <div class="col-xs-3">
+                <input type="number" step="any" class="form-control input-number" value="@majVoeux.getVolume_horaire_TD_assure" id="nb_h_tds" name="nb_h_tds" required/>
+            </div>
+
+
+            <label for="prioritaire_tds">Prioritaire :</label>
+            <input type="radio"  name="prioritaire_tds" value="1" required @{if(majVoeux.getPrioritaireTD == 1)("checked")}> Oui
+            <input type="radio"  name="prioritaire_tds" value="0" @{if(majVoeux.getPrioritaireTD == 0)("checked")}> Non <br/>
+
+            <div class="col-xs-3">
+                <label for="choixTD">&nbsp;&nbsp;Choix :</label>
+                <input type="radio" name="choixTD" value="1" required @{if(majVoeux.getChoixTD == 1)("checked")}> 1
+                <input type="radio" name="choixTD" value="2" @{if(majVoeux.getChoixTD == 2)("checked")}> 2 <br/>
+            </div>
+
+            <br/><br/>
+
+            <div class="col-xs-12">
+                <label for="commentaire">Commentaire :</label>
+                <textarea class="form-control" rows="5" id="commentaire" name="commentaire" required>@majVoeux.getCommentaire</textarea>
+            </div>
+
+            <input type="hidden" id="id_voeu" name="id_voeu" value="@majVoeux.getId_voeu">
+            <input type="hidden" id="ref_ec" name="ref_ec" value="@majVoeux.getRef_ec">
+            <input type="hidden" id="nomPeriode" name="nomPeriode" value="@majVoeux.getPeriod.id">
+
+
+            <div class="row">
+                <div class="col-lg-6">
+
+                    <div class="col-xs-12">
+                        <br/>
+                        <button type="submit" class="btn btn-primary" onclick="confirmUpdate('modifier_voeux')">
+                            <i class="icon-user icon-white"></i> Modifier le voeu
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </form> <!-- Fin Formulaire -->
+    </div>
+}

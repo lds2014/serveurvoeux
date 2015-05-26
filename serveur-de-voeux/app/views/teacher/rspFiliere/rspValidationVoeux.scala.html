@@ -1,0 +1,148 @@
+@(filiere: Filiere)(login:String)(firstname: String)(lastname: String)(rsp: String)
+@import play.data.format.Formats.DateTime
+@import helper._
+@import java.lang.String;
+@import java.math.BigInteger; /*var i=0; var j=0; var k=0; var a=0;*/
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/">Home</a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux"> Gerer ces voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux/historique"> Historique des voeux </a> </li>
+                    </ul>
+
+                    @if(rsp.equals("true")){
+
+                        <ul class="nav navbar-nav">
+
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Gestion Filiere <b class="caret"></b> </a>
+
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="/ServeurDeVoeux/RspFiliere/@login">Consulter les manques</a>
+                                    </li>
+
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="/ServeurDeVoeux/RspFiliere/valider/@login">Consulter la liste des voeux</a>
+                                    </li>
+
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="/ServeurDeVoeux/RspFiliere/info/@login">Information de la filière</a>
+                                    </li>
+
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="#">Afficher les conflits</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> <br/>
+    </div>
+} {
+
+    <br/><br/><br/><br/><br/>
+
+    <div id="contentId">
+        @filiere.getLibelle_filiere()
+        <br/><br/>
+
+        @for(ue <- UE.findInvolving(filiere.getCodefiliere())) {
+
+                <!-- Default panel contents -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">@ue.getLibelle_UE</div>
+                    <!-- Table -->
+                <table class="table table-striped table-bordered wishesList" cellspacing="0" width="100%">
+                    <thead>
+                        <th> Enseignant </th>
+                        <th> EC </th>
+                        <th> Volume horaire Cours </th>
+                        <th> Volume horaire TD</th>
+                        <th> Prioritaire Cours</th>
+                        <th> Prioritaire TD</th>
+                        <th> Date </th>
+                        <th> Valider </th>
+                        <th> Refuser </th>
+                    </thead>
+                    <tbody>
+                    @for(ec <- EC.findInvolving(ue.getCodeUE())){
+
+                        @for(vo <- Voeux.getListeVoeuxEc(ec.getCode_Ec)) {
+                            <tr>
+                                <td> @Users.getUserName(vo.getRef_utilisateurs)</td>
+                                <td> @EC.getLibelleByRef(vo.getRef_ec)</td>
+                                <td> @vo.getVolume_horaire_cours_assure</td>
+                                <td> @vo.getVolume_horaire_TD_assure </td>
+
+                                @if(vo.getPrioritaireCours ==1){
+                                    <td > Prioritaire</td>
+
+                                }else{
+                                    <td> Non prioritaire</td>
+
+                                }
+
+                                @if(vo.getPrioritaireTD==1){
+                                    <td> Prioritaire</td>
+
+
+                                }else{
+                                    <td>Non prioritaire</td>
+
+                                }
+
+
+                                <td> @vo.getDate </td>
+                                <td data-id="@vo.getId_voeu" class="accept-control">
+                                    <button type="button" class="btn btn-success btn-lg">
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+
+                                <td data-id="@vo.getId_voeu" class="reject-control">
+                                    <button type="button" class="btn btn-danger btn-lg">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+                <br/>
+            </div>
+        }
+
+
+    </div>
+}

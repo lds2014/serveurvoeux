@@ -1,0 +1,211 @@
+@(login: String)(firstname: String)(lastname: String)(rsp: String)(teacher: String)(periodeOuverte: String)(nomPeriode: String)(listeVoeuxAnneeCourant: java.util.List[Voeux])(ec: java.util.List[EC])(calculeHeuresEnseignant: CalculateHoursTeacher)
+
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="/ServeurDeVoeux/">Home</a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux"> Gerer ces voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux/historique"> Historique des voeux </a> </li>
+                    </ul>
+
+                    @if(teacher.equals("true")){
+                        <ul class="nav navbar-nav">
+                            <li><a href="/ServeurDeVoeux/UnAvailability/"> Préférences </a> </li>
+                        </ul>
+                    }
+
+                    @if(rsp.equals("true")){
+
+                        <ul class="nav navbar-nav">
+
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Gestion Filiere <b class="caret"></b> </a>
+
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="/ServeurDeVoeux/RspFiliere/@login">Consulter les manques</a>
+                                    </li>
+
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="/ServeurDeVoeux/RspFiliere/valider/@login">Consulter la liste des voeux</a>
+                                    </li>
+
+                                    <li class="dropdown-submenu">
+                                        <a tabindex="-1" href="/ServeurDeVoeux/RspFiliere/info/@login">Information de la filière</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> <br/>
+    </div>
+} {
+
+    <div class="wide"></div><br>
+    <div id="titre"> <div> Bienvenu sur le serveur de voeu </div></div>
+    <hr>
+
+    <h4 class="well">
+        Profil : @if(rsp.equals("true")){Responsable de filière}else{Enseignant}
+    </h4>
+
+    @if(periodeOuverte.equals("false")){
+
+        <div class="container">
+            <div class="row">
+                <div><div class="border2"><h3 class="centrer"> Il n'y a aucune période de saisie de voeu ouverte ! </h3></div></div>
+            </div>
+        </div>
+
+    }else{
+
+        <div class="container">
+
+           <div class="row">
+                <div ><div class="border1"><h3 class="centrer"> La période des voeux @nomPeriode est ouverte. </h3></div></div>
+            </div><br/><br/>
+
+
+            <div class="row">
+                <!-- Bloc qui affiche les heures statutaires des enseignants -->
+                <div class="col-lg-6 col-sm-7">
+                    <div class="well"> Informations sur vos heures </div>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tr>
+                                    <td>Heures dues :</td>
+                                    <td> Heures supplémentaires : </td>
+                                </tr>
+                                <tr>
+                                    <td> @calculeHeuresEnseignant.getHours h </td>
+                                    <td> @calculeHeuresEnseignant.getExtraHours h </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tr>
+                                    <td>Heures prit - validés :</td>
+                                    <td> Situation : </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @calculeHeuresEnseignant.getHours_to_doing_CM h <b> CM </b> <br/><br/>
+                                        @calculeHeuresEnseignant.getHours_to_doing_TD h <b> TD </b>  <br/><hr>
+                                        <b>Total : @calculeHeuresEnseignant.getTotal h</b>
+
+                                    </td>
+                                    <td>
+                                        @if(calculeHeuresEnseignant.getStatut.equals("HEURES_A_PRENDRE")){
+                                            <div class="alert alert-success" role="alert">
+                                                <strong> Vous pouvez encore prendre @{ calculeHeuresEnseignant.getHours - calculeHeuresEnseignant.getTotal } h</strong>
+                                            </div>
+                                        }
+
+                                        @if(calculeHeuresEnseignant.getStatut.equals("HEURES_SUPPLEMENTAIRES")){
+                                            <div class="alert alert-warning" role="alert">
+                                                <strong> Vous êtes en heure supplémentaire ! </strong>
+                                            </div>
+                                        }
+
+                                        @if(calculeHeuresEnseignant.getStatut.equals("DEPASSEMENT_D_HEURES")){
+                                            <div class="alert alert-danger" role="alert">
+                                                <strong> Attention ! vous dépassez vos heures <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> </strong>
+                                            </div>
+                                        }
+
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                </div>
+
+                <!-- Bloc qui affiche l'etat des voeux -->
+                <div class="col-lg-6 col-sm-7">
+                        <div class="well"> Liste des voeux demandés pour la période @nomPeriode : </div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th> Libéllé de l'EC </th>
+                                        <th> Heure CM demandé </th>
+                                        <th> Heure TD demandé </th>
+                                        <th> Statut </th>
+
+                                    </tr>
+                                    <tbody>
+
+                                        @for(lvoeux <- listeVoeuxAnneeCourant){
+                                            <tr>
+                                                @for(obec <- ec) {
+                                                    @if(obec.getCode_Ec.equals(lvoeux.getRef_ec)) {
+                                                        <td> @obec.getLibelle_ec </td>
+                                                    }
+                                                }
+
+                                                <td> @lvoeux.getVolume_horaire_cours_assure h &nbsp;(x 1,5 Eq Td) </td>
+                                                <td> @lvoeux.getVolume_horaire_TD_assure h </td>
+                                                <td>
+                                                     @if(lvoeux.getValide.equals("ATTENTE")){
+                                                         <div class="alert alert-warning" role="alert">
+                                                             <strong> En attente de validation </strong>
+                                                         </div>
+                                                     }
+
+                                                    @if(lvoeux.getValide.equals("VALIDE")){
+                                                        <div class="alert alert-success" role="alert">
+                                                            <strong> Valider </strong>
+                                                        </div>
+                                                    }
+
+                                                    @if(lvoeux.getValide.equals("REFUSE")){
+                                                        <div class="alert alert-danger" role="alert">
+                                                            <strong> Refuser </strong>
+                                                        </div>
+                                                    }
+
+                                                </td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                         </div>
+                    </div>
+
+            </div>
+
+        </div>
+    }
+
+
+}

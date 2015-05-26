@@ -1,0 +1,189 @@
+@(firstname: String)(lastname: String)(message: String)(utilisateurs: java.util.List[Users])(userupdate: Users)(roleu: String)(teacher: Teacher)
+
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav> <br/>
+    </div>
+} {
+
+    <br/> <br/> <br/>
+
+
+    <div class="container" style="border: 1px #e4e4e4 solid;">
+
+        <div class="page-header">
+            <h1 style="color: cornflowerblue"> Modifier un utilisateur </h1>
+        </div>
+
+
+        <!-- Afficher l'utilisateur à modifier -->
+        <div id="div3" style="margin-left:390px; width: 100%;" class="col-xs-10 col-sm-10">
+
+            <form id="utilisateur" name="utilisateur" class="form-horizontal" role="form" method="POST" action="update"> <!-- Formulaire -->
+                <div class="col-xs-3"> <!-- Année -->
+                    <label for="idutilisateur">Selectionner un utilisateur : </label>
+                    <select class="form-control" id="idutilisateur" name="idutilisateur" onchange="showUser()">
+
+                        <option value="none" @if(userupdate.getLogin.equals("none"))("selected")> - </option>
+
+                        @for(u <- utilisateurs){
+                            <option value="@u.getLogin" @if(u.getLogin.equals(userupdate.getLogin))("selected")>@u.getFirstName @u.getLastName</option>
+                        }
+
+                    </select> <br/>
+                </div>
+            </form>
+        </div>
+
+        @if(!userupdate.getLogin.equals("none")){
+
+            <form accept-charset="UTF-8" role="form" method="POST" id="updating" name="updating" action="updating">
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="lastName"> Nom </label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="lastName" name="lastName"  placeholder="Nom" value="@userupdate.getLastName"required>
+                    </div><br/><br/><br/>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="firstName"> Prénom </label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="firstName" name="firstName"  placeholder="Prénom" value="@userupdate.getFirstName" required>
+                    </div><br/><br/><br/>
+                </div>
+
+
+                    <legend>Informations de Connexion</legend>
+
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label" for="login" > Login </label>
+                        <div class="col-sm-5">
+                            @userupdate.getLogin
+                            <input type="hidden" id="login" name="login" value="@userupdate.getLogin">
+                        </div>
+                    </div>
+
+                    <div>
+                        <br/><br/><br/>
+                        <label class="col-sm-1 "> Role </label>
+                        <div class="radio-inline">
+                            <input type="radio" id="role1" name="role" value="ADMIN" required @{if(roleu == "ADMIN")("checked")}> Administrateur
+                        </div>
+                        <div class="radio-inline">
+                            <input type="radio" id="role2" name="role" value="USER" @{if(roleu == "USER")("checked")}> Utilisateur
+                        </div>
+                    </div> <br/><br/>
+
+                    <div>
+                        <label  class="col-sm-1 control-label" for="teacher">Profil Enseignant </label>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="teacher" name="teacher">
+                            @for( i <- 0 to Teacher.listJob().size()-1){
+                                <option value="@Teacher.listJob().get(i)"
+                                    @if(teacher.job().equals(Teacher.listJob().get(i))){selected="selected" }
+                                >@Teacher.listJob().get(i)</option>
+                            }
+                            </select>
+                        </div><br/><br/>
+                    </div><br/><br/>
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="hours"> Heure CM </label>
+                    <div class="col-sm-5">
+                        <input type="number" class="form-control" id="hours" name="hours" placeholder="hours" min="0" max="192"  value="@teacher.hours" required>
+                    </div><br/><br/><br/>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" for="extraHours"> Heure TD </label>
+                    <div class="col-sm-5">
+                        <input type="number" class="form-control" id="extraHours" name="extraHours" placeholder="extraHours" min="0" max="128" value="@teacher.extraHours" required>
+                    </div><br/><br/><br/>
+                </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label" for="news"> Password </label>
+                        <div class="col-sm-5">
+                            <input type="password" class="form-control" id="news" name="news" placeholder="New Password" value="@userupdate.getPassword" required>
+                        </div>
+                    </div> <br/><br/><br/>
+
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label" for="conf"> Confirmation Password </label>
+                        <div class="col-sm-5">
+                            <input type="password" class="form-control" id="conf" name="conf" placeholder="ConfPassword" value="@userupdate.getPassword"required>
+                        </div><br/><br/><br/>
+                    </div>
+
+
+                <fieldset>
+                    <legend>Informations Personnelles</legend>
+
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label" for="address"> Adresse </label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" id="address" name="address"  placeholder="Adresse" value="@userupdate.getAddress" required>
+                        </div><br/><br/><br/>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label" for="email"> Email </label>
+                        <div class="col-sm-5">
+                            <input type="email" class="form-control" id="email" name="email"  placeholder="Email" value="@userupdate.getEmail" required>
+                        </div><br/><br/><br/>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label" for="phoneNumber"> Téléphone </label>
+                        <div class="col-sm-5">
+                            <input type="tel"class="form-control" id="phoneNumber" name="phoneNumber"  placeholder="Téléphone" value="@userupdate.getPhoneNumber" required>
+                        </div><br/><br/><br/>
+                    </div>
+
+                </fieldset>
+
+
+                <div class="col-xs-12">
+                    <br/>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="icon-user icon-white"></i> Modifier
+                    </button>
+
+                    <input class="btn btn-danger" type="reset" value="Reset">
+                </div>
+
+            </form><!-- Fin form -->
+        }
+
+
+        <script type="text/javascript">
+
+        $("#div4").delay(6350).fadeOut(600); // Message de confirmation d'ajout d'un user
+
+        </script>
+
+    </div> <!-- Fin container -->
+}

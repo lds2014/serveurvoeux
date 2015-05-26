@@ -1,0 +1,551 @@
+@(filieres: java.util.List[Filiere])(ue: java.util.List[UE])(shoWUe: String)(idfiliere : String)(ec: java.util.List[EC])(idue: String)(shoWEc: String)(showBloc: String)(idec: String)(ufr: java.util.List[UFR])(showFiliere: String)(idufr: String)(firstname: String)(lastname: String)(userlogin: String)(ajout_voeu: String)(listeVoeuxAnneeCourant: java.util.List[Voeux])(libelleEC: java.util.List[EC])(verificationPeriodeOuverte: java.util.List[String])(referenceEC:EC)(afficheEnseignants: java.util.List[ShowAllTeacherOnWishSelected])(libellePeriode: java.util.List[String])
+@import java.util
+@import play.data.format.Formats.DateTime
+@import helper._
+@import java.lang.String;
+@import java.math.BigInteger; var i=0; var j=0; var k=0; var a=0; var b=0;
+
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/">Home</a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="/ServeurDeVoeux/voeux"> Gerer ces voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux/historique"> Historique des voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/UnAvailability/"> Préférences </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> <br/>
+    </div> <!-- Fin en-tête -->
+
+} {
+
+    <br/><br/><br/><br/><br/>
+
+
+    <div class="container" style="border: 1px #e4e4e4 solid;">
+
+        @if(verificationPeriodeOuverte.get(0).equals("true")) {
+            <div class="page-header">
+                <h1 style="color: greenyellow;text-align: center;"> La période de voeu @verificationPeriodeOuverte.get(1) est ouverte </h1>
+            </div>
+        }else{
+            <div class="page-header">
+                <h1 style="color: red;text-align: center;"> Il n'y a aucune période de saisie de voeu ouverte ! </h1>
+                <h3 style="text-align: center;"> Vous ne pouvez pas encore saisir de voeu. Contacter l'administrateur. </h3>
+            </div>
+        }
+
+            <!-- PERIODE OUVERTE : Affichage du bloc de création d'un voeu -->
+        @if(verificationPeriodeOuverte.get(0).equals("true")) {
+
+            <div class="col-md-3">
+                <ul class="nav nav-pills nav-stacked">
+                    <li role="presentation" id="bouton10"><a href="#" class="alert alert-danger"> Importer vos voeux précédents </a></li>
+                    <li  class="active"><a href="#" id="bouton0">  Ajouter un voeu </a></li>
+                    <li role="presentation"><a href="#" id="bouton1">Modifier un voeu</a></li>
+                    <li role="presentation"><a href="#" id="bouton2">Supprimer un voeu</a></li>
+                </ul>
+            </div>
+
+                <!-- Historique des voeux, sur la période ouverte, de l'enseignant -->
+            <div class="col-md-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"> Historique des voeux saisie pour la période @verificationPeriodeOuverte.get(1) </h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+
+                            <tr>
+                                <th> # </th>
+                                <th> Libellé EC </th>
+                                <th> Nb heures de cours </th>
+                                <th> Nb heures de Td </th>
+                                <th> Date </th>
+                                <th> Statut </th>
+                            </tr>
+
+                            @for(listWish <- listeVoeuxAnneeCourant) {
+                                <tr>
+                                    <td> @(i += 1) @i </td>
+                                    @for(obec <- libelleEC) {
+                                        @if(obec.getCode_Ec.equals(listWish.getRef_ec)) {
+                                            <td> @obec.getLibelle_ec </td>
+                                        }
+                                    }
+                                    <td> @listWish.getVolume_horaire_cours_assure h </td>
+                                    <td> @listWish.getVolume_horaire_TD_assure h </td>
+                                    <td> @listWish.getDate </td>
+                                    <td> @listWish.getValide </td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- Fin Historique -->
+
+                <!-- Confirmation d'un ajout de voeu -->
+            @if(ajout_voeu == "true") {
+                <div id="div4" class="col-md-9" style="margin-left:280px; width: 75%;">
+                    <div class="alert alert-success" role="alert">
+                        <a href="#" class="alert-link"><strong>Well done !</strong> Ajout du voeu avec succès</a>
+                    </div>
+                </div>
+            }
+
+                <!-- Container principal : Contient les actions d'ajouts, de modifications et de suppressions des voeux -->
+            <div class="container" >
+
+                <div id="div0" class="col-xs-10 col-sm-10" style="text-align: center; margin-left:280px; width: 100%; @{if(showFiliere == "false")("display:none;")else("display:inline;")}">
+                    <h2 style="text-align: left;">  Ajouter un voeu </h2><br/>
+                    <div class="row">
+                        <div class="blocprogramme dataload" data-prg="36" data-id="0">
+
+                            <form class="form-horizontal" role="form" method="POST" action="ajouter"> <!-- Formulaire -->
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="form-group">
+
+                                            <div class="col-xs-12"> <!-- UFR -->
+                                                <label for="s_ufrd">Selectionner l'UFR : </label>
+                                                <select class="form-control" id="s_ufr" name="s_ufr" onchange="showFiliere(this.value)">
+
+                                                    @if(!showFiliere.equals("true")){
+                                                        <option value="">- </option>
+                                                    }
+
+                                                    @for(obufr <- ufr){
+
+                                                        <option value="@obufr.getCodeufr" @if(obufr.getCodeufr.equals(idufr))("selected")> @obufr.getCodeufr - @obufr.getLibelle_ufr </option>
+                                                    }
+
+                                                </select> <br/>
+                                            </div>
+
+                                            <div class="col-xs-12"> <!-- FILIERE -->
+                                                <label for="s_filiere">Selectionner la filière : </label>
+                                                <select class="form-control" id="selectFiliere" name="selectFiliere" onchange="showUE(this.value)">
+
+                                                    @if(!shoWUe.equals("true")){
+                                                        <option value="">- </option>
+                                                    }
+
+                                                    @if(showFiliere == "true"){
+                                                        @for(obf <- filieres) {
+
+                                                            <option value="@obf.getCodefiliere()" @if(obf.getCodefiliere.equals(idfiliere))("selected")> @obf.getLibelle_filiere @obf.getVoie </option>
+                                                        }
+                                                    }
+
+                                                </select> <br/>
+                                            </div>
+
+                                            <div id="showue" style=display:"inline"> <!-- UE -->
+                                                <div class="col-xs-12">
+                                                    <label for="s_ue">Selectionner l'UE :</label>
+                                                    <select class="form-control" id="s_ue" name="s_ue" onchange="showEC(this.value)" >
+
+                                                        @if(!shoWEc.equals("true")){
+                                                            <option value="">- </option>
+                                                        }
+
+                                                        @if(shoWUe == "true") {
+                                                            @for(oue <- ue) {
+
+                                                                <option value="@oue.getCodeUE" @if(oue.getCodeUE.equals(idue))("selected")>@oue.getLibelle_UE</option>
+                                                            }
+                                                        }
+
+                                                    </select> <br/>
+                                                </div>
+                                            </div>
+
+                                            <div id="showec" style=display:"inline"> <!-- EC -->
+                                                <div class="col-xs-12">
+                                                    <label for="s_ec">Selectionner l'EC :</label>
+                                                    <select class="form-control" id="s_ec" name="s_ec" onchange="showBloc(this.value)">
+                                                        @if(!showBloc.equals("true")){
+                                                            <option value="">- </option>
+                                                        }
+
+                                                        @if(shoWEc == "true") {
+                                                            @for(oec <- ec) {
+
+                                                                <option value="@oec.getCode_Ec" @if(oec.getCode_Ec.equals(idec))("selected")>@oec.getLibelle_ec </option>
+                                                            }
+                                                        }
+
+                                                    </select> <br/>
+                                                </div>
+                                            </div>
+
+                                                <!-- Bloc générale une fois l'EC sélectionné -->
+                                            <div id="divBloc" @{if(showBloc == "false")("style=display:none")else("style=display:inline")}>
+
+                                                <div class="col-lg-12">
+                                                    <div class="panel panel-primary">
+                                                        <div class="panel-heading">
+                                                        @for(oec <- ec) {
+                                                            @if(oec.getCode_Ec.equals(idec)){<h3 class="panel-title"> EC : <strong>@oec.getLibelle_ec </strong></h3>}
+                                                        }
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <table class="table table-striped">
+                                                                <tr>
+                                                                    <th> Total heures cours </th>
+                                                                    <th> Total heures tds </th>
+                                                                    <th> Nombre d'heures d'examen </th>
+                                                                    <th> ECTS </th>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <td> @referenceEC.getHeures_cours </td>
+                                                                    <td> @referenceEC.getHeures_projet </td>
+                                                                    <td> @referenceEC.getHeures_exam </td>
+                                                                    <td> @referenceEC.getEcts </td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                    </div><br/>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="panel panel-primary">
+                                                        <div class="panel-heading">
+                                                            <h3 class="panel-title"><strong> Enseignant(s) ayant sélectionné ce voeu </strong></h3>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <table class="table table-striped">
+
+                                                                <tr>
+                                                                    <th> Nom </th>
+                                                                    <th> Prénom </th>
+                                                                    <th> Nombre d'heures de cours </th>
+                                                                    <th> Nombre d'heures de td </th>
+                                                                </tr>
+
+                                                                @for(enseignants <- afficheEnseignants){
+
+                                                                    <tr>
+                                                                        <th> @enseignants.getNom </th>
+                                                                        <th> @enseignants.getPrenom </th>
+                                                                        <th> @enseignants.getHeures_cours h </th>
+                                                                        <th> @enseignants.getHeures_td h </th>
+                                                                    </tr>
+                                                                }
+
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xs-4">
+                                                    <label for="nb_h_cours">Nombre d'heures de Cours</label>
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    <input type="number" step="any" class="form-control input-number" value="0" id="nb_h_cours" name="nb_h_cours" required>
+                                                </div>
+
+                                                <label for="prioritaire_cours">Prioritaire :</label>
+                                                <input type="radio"  name="prioritaire_cours" value="1" class="bn" required> Oui
+                                                <input type="radio"  name="prioritaire_cours" value="0"> Non <br/>
+
+                                                <div class="col-xs-3">
+                                                    <label for="choixCours">&nbsp;&nbsp;Choix :</label>
+                                                    <input type="radio" name="choixCours" value="1" required> 1
+                                                    <input type="radio" name="choixCours" value="2"> 2
+                                                </div>
+
+                                                <div class="span4 pull-right"> <!--Alert, Si l'utilisateur choisie oui -->
+                                                    <div class="alert alert-danger fade">
+                                                        <button type="button" class="close" data-dismiss="alert">×</button>
+                                                        <strong>Alert!</strong> Un enseignant est prioritaire 4 années consécutives sur un même cours ou TD. Si
+                                                        cela n'est pas le cas, cocher la case 'NON'
+                                                    </div>
+                                                </div> <br/>
+
+
+
+                                                <div class="col-xs-4">
+                                                    <label class="control-label"  for="nb_h_tds">Nombre d'heures de Tds</label>
+                                                </div>
+                                                <div class="col-xs-4">
+                                                    <input type="number" step="any" class="form-control input-number" value="0" id="nb_h_tds" name="nb_h_tds" required/>
+                                                </div>
+
+
+                                                <label for="prioritaire_tds">Prioritaire :</label>
+                                                <input type="radio"  name="prioritaire_tds" value="1" required> Oui
+                                                <input type="radio"  name="prioritaire_tds" value="0"> Non <br/>
+
+                                                <div class="col-xs-3">
+                                                    <label for="choixTD">&nbsp;&nbsp;Choix :</label>
+                                                    <input type="radio" name="choixTD" value="1" required> 1
+                                                    <input type="radio" name="choixTD" value="2"> 2 <br/>
+                                                </div>
+
+                                                <div class="col-xs-12">
+                                                    <label for="commentaire">Commentaire :</label>
+                                                    <textarea class="form-control" rows="5" id="commentaire" name="commentaire" required></textarea>
+                                                </div>
+
+                                                <input type="hidden" id="ref_ec" name="ref_ec" value="@idec">
+                                                <input type="hidden" id="ref_utilisateur" name="ref_utilisateur" value="@userlogin">
+                                                <input type="hidden" id="nomPeriode" name="nomPeriode" value="@verificationPeriodeOuverte.get(1)">
+
+                                                <div class="col-xs-12">
+                                                    <br/>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="icon-user icon-white"></i> Valider voeu
+                                                    </button>
+
+                                                    <input class="btn btn-danger" type="reset" value="Reset">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </form> <!-- Fin Form -->
+                        </div>
+                    </div>
+                </div> <!-- Fin ajout voeux -->
+
+                <!-- Modifier un voeu -->
+                <div id="div1" style="display:none;margin-left:280px; width: 100%;" class="col-xs-10 col-sm-10">
+                    <h2> Modifier un voeu </h2>
+
+                        <!-- Affichage des voeux de l'année en cours à modifier -->
+                    <div class="col-md-9">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Voeux saisie période @verificationPeriodeOuverte.get(1) </h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table table-hover">
+
+                                    <tr>
+                                        <th> # </th>
+                                        <th> Libellé EC </th>
+                                        <th> Nb heures de cours </th>
+                                        <th> Nb heures de Td  </th>
+                                        <th> Date </th>
+                                        <th> Statut </th>
+                                        <th> Modifier </th>
+                                    </tr>
+
+                                    @for(listWish <- listeVoeuxAnneeCourant) {
+
+                                            <!-- On affiche tous les voeux en ATTENTE pour les modifier -->
+                                        @if(listWish.getValide.equals("ATTENTE")){
+                                            @(a += 1)
+                                            <form id="modifvoeux@a" name="modifvoeux@a" class="form-horizontal" role="form" method="POST" action="/ServeurDeVoeux/voeux/modifier"> <!-- Formulaire -->
+                                                <tr>
+                                                    <td> @a </td>
+                                                    @for(obec <- libelleEC) {
+                                                        @if(obec.getCode_Ec.equals(listWish.getRef_ec)) {
+                                                            <td> @obec.getLibelle_ec </td>
+                                                        }
+                                                    }
+                                                    <td> @listWish.getVolume_horaire_cours_assure h </td>
+                                                    <td> @listWish.getVolume_horaire_TD_assure h </td>
+                                                    <td> @listWish.getDate </td>
+                                                    <td> @listWish.getValide </td>
+                                                    <td> <button class="btn btn-warning" type="button" onclick="confirmUpdate('modifvoeux@a')" > <i class="glyphicon glyphicon-refresh"></i> Modifier </button> </td>
+                                                </tr>
+
+                                                <input type="hidden" id="ref_ec_modif" name="ref_ec_modif" value="@listWish.getRef_ec">
+                                                <input type="hidden" id="id_voeu" name="id_voeu" value="@listWish.getId_voeu">
+                                            </form>
+                                        }
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div> <!-- Fin modification voeu-->
+                </div>
+
+                    <!-- Supprimer un voeu -->
+                <div id="div2" style="display:none;margin-left:260px; width: 100%;" class="col-xs-10 col-sm-10">
+                    <h2> Supprimer un voeu </h2>
+
+                        <!-- Affichage des voeux de l'année en cours à supprimer -->
+                    <div class="col-md-9">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Voeux saisie période @verificationPeriodeOuverte.get(1) </h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table table-hover">
+
+                                    <tr>
+                                        <th> # </th>
+                                        <th> Libellé EC </th>
+                                        <th> Nb heures de cours </th>
+                                        <th> Nb heures de Td  </th>
+                                        <th> Date </th>
+                                        <th> Statut </th>
+                                        <th> Supprimer </th>
+                                    </tr>
+
+                                    @for(listWish <- listeVoeuxAnneeCourant) {
+                                        @(j += 1)
+                                        <form id="confirmDelete@j" name="confirmDelete@j" class="form-horizontal" role="form" method="POST" action="/ServeurDeVoeux/voeux/supprimer"> <!-- Formulaire -->
+                                            <tr>
+                                                <td> @j </td>
+                                                @for(obec <- libelleEC) {
+                                                    @if(obec.getCode_Ec.equals(listWish.getRef_ec)) {
+                                                        <td> @obec.getLibelle_ec </td>
+                                                    }
+                                                }
+                                                <td> @listWish.getVolume_horaire_cours_assure h </td>
+                                                <td> @listWish.getVolume_horaire_TD_assure h </td>
+                                                <td> @listWish.getDate </td>
+                                                <td> @listWish.getValide </td>
+                                                <td> <button class="btn btn-danger" type="button" onclick="confirmDelete('confirmDelete@j')" > <i class="glyphicon glyphicon-trash"></i> Supprimer </button> </td>
+                                            </tr>
+
+                                            <input type="hidden" id="ref_ec_supp" name="ref_ec_supp" value="@listWish.getRef_ec">
+                                            <input type="hidden" id="nomPeriode" name="nomPeriode" value="@verificationPeriodeOuverte.get(1)">
+
+                                        </form>
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div> <!-- Fin suppression voeu-->
+                </div>
+            </div>
+
+
+            <!-- Récupération des voeux précedents -->
+            <div id="importVoeux" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Importer vos voeux</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Quel période de voeu précédentes voulez-vous importer?</p>
+
+
+                            @for(resultat <- libellePeriode) {
+                                @if(resultat.equals("-")) {
+
+                                    @(b += 1)
+
+                                }
+                            }
+
+                            @if(b > 0) {
+
+                                <p style="color:red"> Vous n'avez jamais fait de voeu !<p>
+
+                            }else{
+
+                                <form  class="form-horizontal" role="form" method="POST" action="/ServeurDeVoeux/voeux/importer">
+
+                                    <select class="form-control" id="importVoeux" name="importVoeux">
+                                        @for(resultat <- libellePeriode){
+                                            @if(resultat.equals("-")){
+
+                                                <p style="color:red"> Vous n'avez jamais fait de voeu !<p>
+
+                                            }else{
+
+                                                @if(!resultat.equals(verificationPeriodeOuverte.get(1))) {
+
+                                                    <option value="@resultat"> @resultat </option>
+
+                                                }
+                                            }
+                                        }
+                                    </select><br/><br/>
+
+                                    <p><strong> <span style="color:red">Attention </span>! Vos voeux seront supprimés, si vous avez saisie des voeux pour la période actuelle (@verificationPeriodeOuverte.get(1)) </strong></p>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-danger">Importer</button>
+                                    </div>
+
+                                </form>
+                            }
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        }
+
+
+        <script type="text/javascript">
+        $("#bouton0").click(function(e) {
+        e.preventDefault();
+        $("#div0").slideDown("slow");
+        $("#div1").slideUp("slow");
+        $("#div2").slideUp("slow");
+        $("#div4").slideUp("slow");
+        });
+        $("#bouton1").click(function(e) {
+        e.preventDefault();
+        $("#div1").slideDown("slow");
+        $("#div2").slideUp("slow");
+        $("#div0").slideUp("slow");
+        $("#div4").slideUp("slow");
+        });
+        $("#bouton2").click(function(e) {
+        e.preventDefault();
+        $("#div2").slideDown("slow");
+        $("#div1").slideUp("slow");
+        $("#div0").slideUp("slow");
+        $("#div4").slideUp("slow");
+        });
+
+
+        $(".bn").on("click", function() {
+        $(".alert").removeClass("in").show();
+        $(".alert").delay(6000).addClass("in").fadeOut(600);
+        });
+
+        $("#div4").delay(5500).fadeOut(600); //
+
+
+        </script>
+    </div> <!-- Fin container -->
+}

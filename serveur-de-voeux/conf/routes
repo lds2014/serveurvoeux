@@ -1,0 +1,55 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET           /ServeurDeVoeux/                                 controllers.admin.Application.index()
+
+# Authentication
+GET           /ServeurDeVoeux/login                            controllers.admin.Application.login()
+POST          /ServeurDeVoeux/login                            controllers.admin.Application.authenticate()
+GET           /ServeurDeVoeux/logout                           controllers.admin.Application.logout()
+
+# Profil
+GET           /ServeurDeVoeux/users/create                     controllers.admin.UsersController.create()
+POST          /ServeurDeVoeux/users/create                     controllers.admin.UsersController.creating()
+GET           /ServeurDeVoeux/users/update                     controllers.admin.UsersController.update()
+POST          /ServeurDeVoeux/users/update                     controllers.admin.UsersController.updateUser()
+POST          /ServeurDeVoeux/users/updating                   controllers.admin.UsersController.updating()
+GET           /ServeurDeVoeux/users/delete                     controllers.admin.UsersController.delete()
+POST          /ServeurDeVoeux/users/delete                     controllers.admin.UsersController.deleting()
+GET           /ServeurDeVoeux/users/research                   controllers.admin.UsersController.research()
+POST          /ServeurDeVoeux/users/infos-user                 controllers.admin.UsersController.info()
+
+# Voeux
+GET           /ServeurDeVoeux/voeux                            controllers.voeux.VoeuxController.index()
+GET           /ServeurDeVoeux/voeux/ufr/:idufr                 controllers.voeux.VoeuxController.getFiliere(idufr)
+GET           /ServeurDeVoeux/voeux/filiere/:id                controllers.voeux.VoeuxController.getUE(id)
+GET           /ServeurDeVoeux/voeux/ue/:idue                   controllers.voeux.VoeuxController.getEC(idue)
+GET           /ServeurDeVoeux/voeux/ec/:idec                   controllers.voeux.VoeuxController.getBloc(idec)
+POST          /ServeurDeVoeux/voeux/ec/ajouter                 controllers.voeux.VoeuxController.add()
+POST          /ServeurDeVoeux/voeux/supprimer                  controllers.voeux.VoeuxController.delete()
+GET           /ServeurDeVoeux/voeux/historique                 controllers.voeux.VoeuxController.historique()
+POST          /ServeurDeVoeux/voeux/historique                 controllers.voeux.VoeuxController.historique()
+POST          /ServeurDeVoeux/voeux/modifier                   controllers.voeux.VoeuxController.update()
+POST          /ServeurDeVoeux/voeux/modifiervoeu               controllers.voeux.VoeuxController.updateVoeu()
+POST          /ServeurDeVoeux/voeux/importer                   controllers.voeux.VoeuxController.importerVoeux()
+PUT           /ServeurDeVoeux/voeux/filiere/                   controllers.voeux.VoeuxController.acceptWish()
+PUT           /ServeurDeVoeux/voeux/filiere/reject/            controllers.voeux.VoeuxController.rejectWish()
+
+# Periode
+GET           /ServeurDeVoeux/Period/                          controllers.periode.PeriodController.index()
+GET           /ServeurDeVoeux/Period/Info/:period              controllers.periode.PeriodController.aPeriod(period : Int)
+POST          /ServeurDeVoeux/Period/                          controllers.periode.PeriodController.add()
+DELETE        /ServeurDeVoeux/Period/                          controllers.periode.PeriodController.delete()
+PUT           /ServeurDeVoeux/Period/                          controllers.periode.PeriodController.update()
+PUT           /ServeurDeVoeux/Period/SetClosed/                controllers.periode.PeriodController.close()
+
+#RspFiliere
+GET           /ServeurDeVoeux/RspFiliere/:login                controllers.filiereController.getManque(login : String)
+GET           /ServeurDeVoeux/RspFiliere/info/:login           controllers.filiereController.InfoFiliere(login : String)
+GET           /ServeurDeVoeux/RspFiliere/valider/:login        controllers.filiereController.valider(login : String)
+
+
+# Map static resources from the /public folder to the /assets URL path
+GET           /assets/*file                                    controllers.Assets.at(path="/public", file)

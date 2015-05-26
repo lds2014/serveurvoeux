@@ -1,0 +1,233 @@
+@(title: String)(content: Html)(sidebar: Html)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <meta charset="utf-8">
+
+        <link rel="stylesheet" href="@routes.Assets.at("bootstrap-3.3.4-dist/css/bootstrap.min.css")">
+
+        <link rel="stylesheet" href="@routes.Assets.at("stylesheets/moncss.css")">
+
+        <link rel="stylesheet" href="@routes.Assets.at("bootstrap-3.3.4-dist/css/bootstrap-theme.min.css")">
+
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/1.0.6/css/dataTables.responsive.css">
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/monjs.js")"></script>
+
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/period.js")"></script>
+
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/rspFiliere.js")"></script>
+
+        <script type="text/javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+
+        <script type="text/javascript" src="@routes.Assets.at("bootstrap-3.3.4-dist/js/bootstrap.min.js")"></script>
+
+        <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+
+        <script type="text/javascript" src="@routes.Assets.at("bootstrap-datepicker-1.4.0-dist/js/bootstrap-datepicker.min.js")"></script>
+
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+
+        <style>
+            .dropdown-submenu{position:relative;}
+            .dropdown-submenu>.dropdown-menu{top:0;left:100%;margin-top:-6px;margin-left:-1px;-webkit-border-radius:0 6px 6px 6px;-moz-border-radius:0 6px 6px 6px;border-radius:0 6px 6px 6px;}
+            .dropdown-submenu:hover>.dropdown-menu{display:block;}
+            .dropdown-submenu>a:after{display:block;content:" ";float:right;width:0;height:0;border-color:transparent;border-style:solid;border-width:5px 0 5px 5px;border-left-color:#cccccc;margin-top:5px;margin-right:-10px;}
+            .dropdown-submenu:hover>a:after{border-left-color:#ffffff;}
+            .dropdown-submenu.pull-left{float:none;}.dropdown-submenu.pull-left>.dropdown-menu{left:-100%;margin-left:10px;-webkit-border-radius:6px 0 6px 6px;-moz-border-radius:6px 0 6px 6px;border-radius:6px 0 6px 6px;}
+        </style>
+
+        <script type="text/javascript">
+
+            $(function() {
+                $('.input-daterange').datepicker({
+                });
+            });
+
+            $(function() {
+                $('#periodList').dataTable( {
+                responsive: true
+                });
+            });
+
+            $(document).ready(function(){
+                $("#bouton10").click(function(){
+                    $("#importVoeux").modal('show');
+                });
+            });
+
+            $(document).ready(function() {
+            $("#gestFi").click(function(){
+            //Mettre tout ce dont tu a besoin pour gérer une filière
+            // 1- Menu (a- Liste des voeux, b-
+            // 2- Les information relative à la filière
+            $("#contentId").html("Vous pouvez gerer votre filiere");
+            })
+
+            function acceptWish(param){
+            if(confirm("Etes-vous sûr de vouloir accepter ce voeu ?")){
+            var $id = parseInt(param.attr("data-id"));
+            $.ajax({
+            type: 'PUT',
+            contentType:'application/json',
+            url: '/ServeurDeVoeux/voeux/filiere/',
+            data: '{"id": '+$id+'}',
+            dataType: 'JSON',
+            timeout: 3000,
+            success: function(data) {
+            },
+            error: function() {
+            console.log('La requête n\'a pas abouti');
+            }
+            });
+
+            var $info = $("<div class='alert alert-success' role='alert'>");
+            $info.html("<button type='button' class='close' data-dismiss='alert' " +
+            "aria-label='Close'> <span aria-hidden='true'>&times;</span></button>" +
+            "Le voeu a bien &eacutet&eacute accept&eacute");
+            $info.prependTo($("#contentId"));
+
+            }
+
+            }
+
+            function rejectWish(param){
+            if(confirm("Etes-vous sûr de vouloir rejeté ce voeu ?")){
+            var $id = parseInt(param.attr("data-id"));
+            $.ajax({
+            type: 'PUT',
+            contentType:'application/json',
+            url: '/ServeurDeVoeux/voeux/filiere/reject/',
+            data: '{"id": '+$id+'}',
+            dataType: 'JSON',
+            timeout: 3000,
+            success: function(data) {
+            },
+            error: function() {
+            console.log('La requête n\'a pas abouti');
+            }
+            });
+
+            var $info = $("<div class='alert alert-success' role='alert'>");
+            $info.html("<button type='button' class='close' data-dismiss='alert' " +
+            "aria-label='Close'> <span aria-hidden='true'>&times;</span></button>" +
+            "Le voeu a bien &eacutet&eacute rejet&eacute");
+            $info.prependTo($("#contentId"));
+
+            }
+            }
+
+            $(".wishesList tbody").on("click", "td.accept-control", function(){
+            acceptWish($(this));
+            })
+
+            $(".wishesList tbody").on("click", "td.reject-control", function(){
+            rejectWish($(this));
+            })
+
+            });
+
+
+        /*$(function() {
+        $( ".datepicker" ).datepicker();
+        });*/
+
+        function showUser()
+        {
+            document.forms["utilisateur"].submit();
+        }
+
+        function confirmDeleteUtilisateur(formulaire) {
+
+            if(confirm("Etes-vous sur de vouloir supprimer cette utilisateur ?"))
+            {
+                document.forms[formulaire].submit();
+            }
+        }
+
+            function showUE(strFiliere)
+            {
+            //window.location =  document.location.href +"/"+strFiliere;
+
+                window.location = "http://"+location.host+"/ServeurDeVoeux/voeux/filiere/" + strFiliere;
+            }
+
+            function showEC(strUe)
+            {
+                window.location = "http://"+location.host+"/ServeurDeVoeux/voeux/ue/" + strUe;
+            }
+
+            function showBloc(strEc)
+            {
+                window.location = "http://"+location.host+"/ServeurDeVoeux/voeux/ec/" + strEc;
+            }
+
+            function showFiliere(strUFR)
+            {
+                window.location = "http://"+location.host+"/ServeurDeVoeux/voeux/ufr/" + strUFR;
+            }
+
+        </script>
+
+        <Style>
+            #titre
+            {
+                color:cornflowerblue;
+                font-weight:100;
+                font-size:33pt;
+                padding:15px;
+                text-align:center;
+                font-family: Helvetica, "Arial Black", Arial, Verdana, sans-serif;
+            }
+
+            .centrer
+            {
+                text-align: center;
+            }
+
+            .border1
+            {
+                color: greenyellow;
+            }
+
+            .border2
+            {
+                color: red;
+            }
+
+            .wide
+            {
+                width:100%;
+                height:295px;
+                background-size:cover;
+                background-image:url('@routes.Assets.at("images/abc.jpg")');
+            }
+
+        </Style>
+
+    </head>
+    <body>
+
+            <!-- En-tête -->
+        @sidebar
+
+            <!-- Contenu -->
+        <div class="container">
+
+        @content
+
+        </div>
+
+            <!-- Pied de page -->
+
+    </body>
+</html>

@@ -1,0 +1,124 @@
+@(firstname: String)(lastname: String)(userlogin: String)(periodeCourante: java.util.List[String])(periodeSelectionnee: String)(listeVoeuxAnneeCourant: java.util.List[Voeux])(libelleEC: java.util.List[EC])
+@import helper._
+@import java.lang.String;
+@import java.math.BigInteger; var i=0;
+
+@main("Serveur de Voeux - Paris X"){
+
+    <!-- En-Tête -->
+    <div id="wrap">
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/ServeurDeVoeux/">Serveur de voeux </a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/">Home</a></li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/voeux"> Gerer ces voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="/ServeurDeVoeux/voeux/historique"> Historique des voeux </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li><a href="/ServeurDeVoeux/UnAvailability/"> Préférences </a> </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a ><span class="glyphicon glyphicon-user"></span> @firstname @lastname  </a></li>
+                        <li><a href="/ServeurDeVoeux/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav> <br/>
+    </div> <!-- Fin en-tête -->
+
+} {
+    <br/><br/><br/><br/><br/>
+
+    <div class="container" style="border: 1px #e4e4e4 solid;">
+
+        <div class="page-header">
+            <h1>Historique de vos anciens voeux</h1>
+        </div>
+
+        <!-- Afficher les voeux des années précédentes -->
+        <div id="div3" style="margin-left:390px; width: 100%;" class="col-xs-10 col-sm-10">
+
+            <form id="historique_voeux" name="historique_voeux" class="form-horizontal" role="form" method="POST" action="historique"> <!-- Formulaire -->
+                <div class="col-xs-3"> <!-- Année -->
+                    <label for="h_v_annees">Selectionner une période : </label>
+                    @if(periodeSelectionnee == "") {
+                        <select class="form-control" id="h_v_annees" name="h_v_annees" onchange="historiqueVoeux()">
+                        <option value="" selected> - </option>
+                        @for(i <- periodeCourante){
+
+                            <option value="@i"> @i </option>
+                        }
+
+                        </select> <br/>
+                    }else{
+                        <select class="form-control" id="h_v_annees" name="h_v_annees" onchange="historiqueVoeux()">
+
+                        @for(i <- periodeCourante){
+
+                            <option value="@i" @if(i.equals(periodeSelectionnee))("selected")> @i </option>
+                        }
+
+                        </select> <br/>
+                    }
+
+                </div>
+             </form>
+        </div>
+
+            <!-- Historique des voeux de l'utilisateur -->
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Historique des voeux @periodeSelectionnee </h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+
+                        <tr>
+                            <th> # </th>
+                            <th> Libellé EC </th>
+                            <th> Nb heures de cours </th>
+                            <th> Nb heures de Td </th>
+                            <th> Date </th>
+                            <th> Statut </th>
+                            <th> Commentaire </th>
+                        </tr>
+                        @for(listWish <- listeVoeuxAnneeCourant) {
+                            <tr>
+                                <td> @(i += 1) @i </td>
+                                @for(obec <- libelleEC) {
+                                    @if(obec.getCode_Ec.equals(listWish.getRef_ec)) {
+                                        <td> @obec.getLibelle_ec </td>
+                                    }
+                                }
+                                <td> @listWish.getVolume_horaire_cours_assure h </td>
+                                <td> @listWish.getVolume_horaire_TD_assure h </td>
+                                <td> @listWish.getDate </td>
+                                <td> @listWish.getValide </td>
+                                <td> @listWish.getCommentaire </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div> <!-- Fin Historique -->
+
+    </div> <!-- Fin container -->
+}
